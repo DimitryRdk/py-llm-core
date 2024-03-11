@@ -6,7 +6,8 @@ from .verifiers import (
     AnswerConsistency,
     ConsistencyVerifier,
 )
-from .analysts import Answer, Analyst
+from .analysts import Answer, Analyst 
+from .classifiers import Classifier
 
 
 __all__ = [
@@ -21,4 +22,5 @@ __all__ = [
     "ConsistencyVerifier",
     "Answer",
     "Analyst",
+    "Classifier",
 ]
