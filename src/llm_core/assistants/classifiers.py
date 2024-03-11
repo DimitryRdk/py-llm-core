@@ -3,39 +3,45 @@ from typing import List, Dict
 from dataclasses import dataclass
 from ..splitters import TokenSplitter
 
-@dataclass
-class ClassificationResult:
-    intent: str
-    confidence: float
-
 
 @dataclass
 class Classification:
     system_prompt = """
-    Imagine you are an AI integrated into an advanced add-in for text processing and document research. Your primary role is to assist users by accurately understanding their queries and identifying their primary intent. You must classify each query into one of the specific categories. Importantly, if the certainty of your classification for a query is not high, or if the query does not clearly fit into one of these categories, provide multiple potential classifications along with an honest and accurate estimate of your confidence for each classification. This approach allows acknowledging when a query's classification is uncertain or does not neatly fit into the provided categories.
+    Imagine you are an AI integrated into an advanced add-in for text processing and document research. Your primary role is to assist users by accurately understanding their queries and identifying their primary intent. After analyzing the query, you must determine the most appropriate classification based on the content and context of the request. You will classify each query by marking one, and only one, of the specific categories as True, which best represents the primary intent of the query.
 
-    Confidence is expressed as a percentage, where a lower percentage indicates higher uncertainty. For queries where you cannot confidently assign a single classification, list the top possible categories with their respective confidence levels. This will offer users a range of possible interpretations and assistance options, enhancing the relevance and usefulness of your support.
+    It is crucial to provide an honest and accurate assessment of the classification. If the query's classification is uncertain or does not neatly fit into the provided categories, you should mark the 'unsure' category as True. This approach acknowledges when a query's classification is uncertain or ambiguous, offering users a range of possible interpretations and assistance options, enhancing the relevance and usefulness of your support.
 
-    Possible outcomes include:
-    - Obtaining information about the cited document
-    - Giving instructions
-    - Formatting text
-    - Translating text
-    - Summarizing
-    - Expanding on a topic
-    - Unsure (use this category when the query's classification is highly uncertain)
+    Possible outcomes (mark one as True):
+    - obtaining_simple_information: for queries seeking straightforward information extraction from the documents.
+    - generating_text_from_information: for queries that require generating new text based on the information provided.
+    - formatting_text: for requests related to text formatting, such as applying styles or adjusting layouts.
+    - translating_text: for translation requests between languages.
+    - summarizing: for summarization requests to condense information.
+    - expanding: for queries asking to expand on a topic with more details.
+    - correcting_information: for requests that seek correction or clarification of misinformation or unclear details.
+    - generating_content: for requests aimed at generating new content based on specified criteria.
+    - unsure: use this category when the query's classification is highly uncertain or does not fit neatly into any specified category.
 
-    Your ability to provide an accurate assessment of both the classification and the level of confidence, especially in cases of ambiguity, is critical to offering relevant and timely assistance to users dealing with complex document processing and research tasks.
+    Your ability to accurately classify the query, reflecting on the certainty of your classification and recognizing when a query might be ambiguous or does not fit neatly into any specified category, is critical to offering relevant and timely assistance to users dealing with complex document processing and research tasks.
     """
 
-    prompt = """Considering the context and the specified categories of possible outcomes, analyze the following query. If the certainty of your primary classification is not high, provide multiple potential classifications with your honest and accurate estimate of your confidence for each. Reflect accurately on the certainty of your classification, including recognizing when a query might be ambiguous or does not fit neatly into any specified category. 
-    
+    prompt = """Considering the context and the specified categories of possible outcomes, analyze the following query. Determine the primary intent and mark the corresponding category as True. If the query might be ambiguous or does not fit neatly into any specified category, mark 'unsure' as True.
+
     Query:
     ```
     {query}
     ```
     """
-    classifications: List[ClassificationResult]
+    obtaining_simple_information: bool = False
+    generating_text_from_information: bool = False
+    giving_instructions: bool = False
+    formatting_text: bool = False
+    translating_text: bool = False
+    summarizing: bool = False
+    expanding: bool = False
+    correcting_information: bool = False
+    generating_content: bool = False
+    unsure: bool = False
 
 @dataclass
 class Classifier:
